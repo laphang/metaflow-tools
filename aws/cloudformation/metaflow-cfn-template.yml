@@ -736,7 +736,8 @@ Resources:
               Action:
                 - "batch:SubmitJob"
               Resource:
-                - !Ref "JobQueue"
+                - !Ref "JobQueueCPU"
+                - !Ref "JobQueueGPU"
                 - !Sub arn:aws:batch:${AWS::Region}:${AWS::AccountId}:job-definition/*:*
         - PolicyName: CustomS3ListAccess
           PolicyDocument:
@@ -858,7 +859,8 @@ Resources:
               Action:
                 - "batch:SubmitJob"
               Resource:
-                - !Ref "JobQueue"
+                - !Ref "JobQueueCPU"
+                - !Ref "JobQueueGPU"
                 - !Sub arn:aws:batch:${AWS::Region}:${AWS::AccountId}:job-definition/*:*
         - PolicyName: CustomS3Access
           PolicyDocument:
@@ -1358,9 +1360,12 @@ Outputs:
   MetaflowDataToolsS3Url:
     Description: Amazon S3 URL for Metaflow DataTools [METAFLOW_DATATOOLS_S3ROOT]
     Value: !Sub "s3://${MetaflowS3Bucket}/data"
-  BatchJobQueueArn:
-    Description: AWS Batch Job Queue ARN for Metaflow [METAFLOW_BATCH_JOB_QUEUE]
-    Value: !Ref JobQueue
+  BatchJobQueueCPUArn:
+    Description: AWS Batch Job CPU Queue ARN for Metaflow [METAFLOW_BATCH_JOB_QUEUE]
+    Value: !Ref JobQueueCPU
+  BatchJobQueueGPUArn:
+    Description: AWS Batch Job GPU Queue ARN for Metaflow [METAFLOW_BATCH_JOB_QUEUE]
+    Value: !Ref JobQueueGPU
   ECSJobRoleForBatchJobs:
     Description: Role for AWS Batch to Access Amazon S3 [METAFLOW_ECS_S3_ACCESS_IAM_ROLE]
     Value: !GetAtt 'BatchS3TaskRole.Arn'

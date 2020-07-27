@@ -1192,7 +1192,7 @@ Resources:
           - !Ref Subnet1
           - !Ref Subnet2
         MinvCpus: !Ref MinVCPUBatch
-        ImageId: 2aa16a1b866d
+        ImageId: ami-039801274835e0d08
         InstanceRole: !GetAtt 'ECSInstanceProfile.Arn'
         InstanceTypes:
           - p2
@@ -1213,7 +1213,6 @@ Resources:
           - !Ref Subnet1
           - !Ref Subnet2
         MinvCpus: !Ref MinVCPUBatch
-        ImageId: 41b377401f03
         InstanceRole: !GetAtt 'ECSInstanceProfile.Arn'
         InstanceTypes:
           - c5

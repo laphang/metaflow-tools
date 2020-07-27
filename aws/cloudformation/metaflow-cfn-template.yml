@@ -1176,7 +1176,7 @@ Resources:
               Condition:
                 StringEquals:
                   ec2:CreateAction: RunInstances
-  ComputeEnvironment:
+  ComputeEnvironmentGPU:
     Type: AWS::Batch::ComputeEnvironment
     Properties:
       Type: MANAGED
@@ -1190,28 +1190,54 @@ Resources:
           - !Ref Subnet1
           - !Ref Subnet2
         MinvCpus: !Ref MinVCPUBatch
+        ImageId: 2aa16a1b866d
         InstanceRole: !GetAtt 'ECSInstanceProfile.Arn'
         InstanceTypes:
-          - p2.xlarge
-          - p2.8xlarge
-          - p3.2xlarge
-          - p3.8xlarge
-          - c5.large
-          - c5.xlarge
-          - c5.2xlarge
-          - c5.4xlarge
+          - p2
+          - p3
         DesiredvCpus: !Ref DesiredVCPUBatch
       State: ENABLED
-  JobQueue:
-    DependsOn: ComputeEnvironment
+  ComputeEnvironmentCPU:
+    Type: AWS::Batch::ComputeEnvironment
+    Properties:
+      Type: MANAGED
+      ServiceRole: !GetAtt 'BatchExecutionRole.Arn'
+      ComputeResources:
+        MaxvCpus: !Ref MaxVCPUBatch
+        SecurityGroupIds:
+          - !GetAtt VPC.DefaultSecurityGroup
+        Type: EC2
+        Subnets:
+          - !Ref Subnet1
+          - !Ref Subnet2
+        MinvCpus: !Ref MinVCPUBatch
+        ImageId: 41b377401f03
+        InstanceRole: !GetAtt 'ECSInstanceProfile.Arn'
+        InstanceTypes:
+          - c5
+          - r5
+        DesiredvCpus: !Ref DesiredVCPUBatch
+      State: ENABLED
+  JobQueueGPU:
+    DependsOn: ComputeEnvironmentGPU
     Type: AWS::Batch::JobQueue
     Properties:
       ComputeEnvironmentOrder:
         - Order: 1
-          ComputeEnvironment: !Ref ComputeEnvironment
+          ComputeEnvironment: !Ref ComputeEnvironmentGPU
       State: ENABLED
       Priority: 1
-      JobQueueName: !Join [ "-", [ 'job-queue', !Ref 'AWS::StackName' ] ]
+      JobQueueName: !Join [ "-", [ 'job-queue-gpu', !Ref 'AWS::StackName' ] ]
+  JobQueueCPU:
+    DependsOn: ComputeEnvironmentCPU
+    Type: AWS::Batch::JobQueue
+    Properties:
+      ComputeEnvironmentOrder:
+        - Order: 1
+          ComputeEnvironment: !Ref ComputeEnvironmentCPU
+      State: ENABLED
+      Priority: 1
+      JobQueueName: !Join [ "-", [ 'job-queue-cpu', !Ref 'AWS::StackName' ] ]
   Api:
     DependsOn: VpcLink
     Type: 'AWS::ApiGateway::RestApi'
